@@ -1,0 +1,11 @@
+{
+    "blacklist": [
+        "analyze-cxx17",
+        "mingw-cxx17",
+        "msys-cxx17",
+        "ninja-vs-15-2017-win64-cxx17",
+        "nmake-vs-15-2017-win64-cxx17",
+        "sanitize-address-cxx17",
+        "sanitize-leak-cxx17"
+    ]
+}

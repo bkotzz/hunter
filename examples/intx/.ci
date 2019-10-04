@@ -1,0 +1,6 @@
+{
+    "blacklist": [
+        "msys-cxx17",
+        "vs-14-2015-sdk-8-1"
+    ]
+}

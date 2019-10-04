@@ -1,0 +1,6 @@
+{
+    "blacklist": [
+        "mingw-cxx17",
+        "msys-cxx17"
+    ]
+}

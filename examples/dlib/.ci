@@ -1,0 +1,10 @@
+{
+    "blacklist": [
+        "analyze-cxx17",
+        "mingw-cxx17",
+        "msys-cxx17",
+        "osx-10-13-cxx14",
+        "sanitize-address-cxx17",
+        "sanitize-leak-cxx17"
+    ]
+}

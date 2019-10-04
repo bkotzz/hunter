@@ -1,0 +1,9 @@
+{
+    "blacklist": [
+        "analyze-cxx17",
+        "mingw-cxx17",
+        "msys-cxx17",
+        "sanitize-address-cxx17",
+        "sanitize-leak-cxx17"
+    ]
+}

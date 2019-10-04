@@ -1,0 +1,9 @@
+{
+    "blacklist": [
+        "analyze-cxx17",
+        "ninja-vs-15-2017-win64-cxx17",
+        "nmake-vs-15-2017-win64-cxx17",
+        "vs-14-2015-sdk-8-1",
+        "vs-15-2017-win64-cxx17"
+    ]
+}

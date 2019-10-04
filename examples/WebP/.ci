@@ -1,0 +1,6 @@
+{
+    "blacklist": [
+        "analyze-cxx17",
+        "msys-cxx17"
+    ]
+}

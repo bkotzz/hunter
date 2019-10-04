@@ -1,0 +1,7 @@
+{
+    "blacklist": [
+        "msys-cxx17",
+        "ninja-vs-15-2017-win64-cxx17",
+        "nmake-vs-15-2017-win64-cxx17"
+    ]
+}
