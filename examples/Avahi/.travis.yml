@@ -1,0 +1,106 @@
+# OSX/Linux (https://github.com/travis-ci-tester/toolchain-table)
+
+os:
+  - linux
+  - osx
+
+# Container-based infrastructure (Linux)
+# * https://docs.travis-ci.com/user/migrating-from-legacy/#How-can-I-use-container-based-infrastructure%3F
+sudo:
+  - false
+
+# Install packages differs for container-based infrastructure
+# * https://docs.travis-ci.com/user/migrating-from-legacy/#How-do-I-install-APT-sources-and-packages%3F
+# * http://stackoverflow.com/a/30925448/2288008
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - cmake
+      - python3
+
+      # https://github.com/travis-ci-tester/travis-test-clang-cxx-11
+      - libstdc++-4.8-dev
+
+      # https://github.com/travis-ci-tester/travis-test-gcc-cxx-11
+      - g++-4.8
+
+env:
+  - PROJECT_DIR=examples/Avahi TOOLCHAIN=default
+  - PROJECT_DIR=examples/Avahi TOOLCHAIN=libcxx
+  - PROJECT_DIR=examples/Avahi TOOLCHAIN=clang-libstdcxx
+  - PROJECT_DIR=examples/Avahi TOOLCHAIN=xcode
+  - PROJECT_DIR=examples/Avahi TOOLCHAIN=osx-10-9
+  - PROJECT_DIR=examples/Avahi TOOLCHAIN=gcc
+  - PROJECT_DIR=examples/Avahi TOOLCHAIN=gcc-4-8
+  - PROJECT_DIR=examples/Avahi TOOLCHAIN=ios-nocodesign
+  - PROJECT_DIR=examples/Avahi TOOLCHAIN=android-ndk-r10e-api-19-armeabi-v7a-neon
+  - PROJECT_DIR=examples/Avahi TOOLCHAIN=analyze
+  - PROJECT_DIR=examples/Avahi TOOLCHAIN=sanitize-address
+  - PROJECT_DIR=examples/Avahi TOOLCHAIN=sanitize-leak
+  - PROJECT_DIR=examples/Avahi TOOLCHAIN=sanitize-thread
+
+matrix:
+  exclude:
+    ### Linux excludes ###
+    # https://github.com/travis-ci-tester/travis-test-clang-with-libcxx
+    - os: linux
+      env: PROJECT_DIR=examples/Avahi TOOLCHAIN=libcxx
+
+    # Xcode is for OSX only
+    - os: linux
+      env: PROJECT_DIR=examples/Avahi TOOLCHAIN=xcode
+    - os: linux
+      env: PROJECT_DIR=examples/Avahi TOOLCHAIN=osx-10-9
+    - os: linux
+      env: PROJECT_DIR=examples/Avahi TOOLCHAIN=ios-nocodesign
+
+    # https://github.com/travis-ci-tester/travis-test-gcc-cxx-11
+    - os: linux
+      env: PROJECT_DIR=examples/Avahi TOOLCHAIN=gcc
+
+    ### OSX excludes ###
+    # TOOLCHAIN=gcc works fine on OSX
+    - os: osx
+      env: PROJECT_DIR=examples/Avahi TOOLCHAIN=gcc-4-8
+
+    # https://github.com/travis-ci-tester/travis-test-mac-clang-address-sanitizer
+    - os: osx
+      env: PROJECT_DIR=examples/Avahi TOOLCHAIN=sanitize-address
+
+    # Linux only
+    - os: osx
+      env: PROJECT_DIR=examples/Avahi TOOLCHAIN=sanitize-leak
+    - os: osx
+      env: PROJECT_DIR=examples/Avahi TOOLCHAIN=sanitize-thread
+
+install:
+  - ./ci/install-deps.sh
+
+  # Installed by install-deps.sh if platform is Linux;
+  # (directory doesn't exist for OSX)
+  - export PATH="`pwd`/cmake-3.4.0-Linux-x86_64/bin:${PATH}"
+
+  # Installed by install-deps.sh if platform is OSX;
+  # (directory doesn't exist for Linux)
+  - export PATH="`pwd`/cmake-3.3.2-Darwin-x86_64/bin:${PATH}"
+
+  # Installed by install-deps.sh if toolchain is Android
+  # (otherwise directory doesn't exist)
+  - export ANDROID_NDK_r10e="`pwd`/android-ndk-r10e"
+
+  # Install Polly toolchains
+  - POLLY_VERSION="0.9.0"
+  - wget "https://github.com/ruslo/polly/archive/v${POLLY_VERSION}.tar.gz"
+  - tar xf "v${POLLY_VERSION}.tar.gz"
+  - export PATH="`pwd`/polly-${POLLY_VERSION}/bin:${PATH}"
+
+  # Check versions of tools
+  - which cmake
+  - cmake --version
+  - which python3
+  - python3 --version
+
+script:
+  - python3 ./jenkins.py

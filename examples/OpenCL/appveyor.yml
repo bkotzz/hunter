@@ -1,0 +1,97 @@
+# Windows (https://github.com/travis-ci-tester/toolchain-table)
+
+environment:
+  global:
+    # This variable used only if '--upload' added to 'jenkins.py'
+    GITHUB_USER_PASSWORD:
+      secure: uW6WWlvCt7CRvvdO9ePjbymPcPNuV1C6HGF8u7Ey6EI=
+
+  matrix:
+    - TOOLCHAIN: "default"
+      PROJECT_DIR: examples\OpenCL
+
+    - TOOLCHAIN: "ninja-vs-12-2013-win64"
+      PROJECT_DIR: examples\OpenCL
+
+    - TOOLCHAIN: "nmake-vs-12-2013-win64"
+      PROJECT_DIR: examples\OpenCL
+
+    - TOOLCHAIN: "nmake-vs-12-2013"
+      PROJECT_DIR: examples\OpenCL
+
+#VC 9-11 do not support some of the code used in the OpenCL headers
+#https://ci.appveyor.com/project/ingenue/hunter/build/1.0.1206/job/ix590h5sb15m7yf3
+#    - TOOLCHAIN: "vs-9-2008"
+#      PROJECT_DIR: examples\OpenCL
+#
+#https://ci.appveyor.com/project/ingenue/hunter/build/1.0.1206/job/8jmat42arvkfgayw
+#    - TOOLCHAIN: "vs-10-2010"
+#      PROJECT_DIR: examples\OpenCL
+#
+#https://ci.appveyor.com/project/ingenue/hunter/build/1.0.1206/job/l3sbaotn6njmrimk
+#    - TOOLCHAIN: "vs-11-2012"
+#      PROJECT_DIR: examples\OpenCL
+
+    - TOOLCHAIN: "vs-12-2013-win64"
+      PROJECT_DIR: examples\OpenCL
+
+    - TOOLCHAIN: "vs-12-2013-xp"
+      PROJECT_DIR: examples\OpenCL
+
+    - TOOLCHAIN: "vs-12-2013"
+      PROJECT_DIR: examples\OpenCL
+
+    - TOOLCHAIN: "vs-14-2015"
+      PROJECT_DIR: examples\OpenCL
+
+#this build links to native direct x which uses some VC specific code that gcc does not understand
+#https://ci.appveyor.com/project/ingenue/hunter/build/1.0.1206/job/firtgemm7o3nhdsf
+#    - TOOLCHAIN: "mingw"
+#      PROJECT_DIR: examples\OpenCL
+
+    - TOOLCHAIN: "msys"
+      PROJECT_DIR: examples\OpenCL
+
+install:
+  # Python 3
+  - cmd: set PATH=C:\Python34-x64;C:\Python34-x64\Scripts;%PATH%
+
+  # Install Python package 'requests'
+  - cmd: pip install requests
+
+  # Install latest Polly toolchains and scripts
+  - cmd: appveyor DownloadFile https://github.com/ruslo/polly/archive/master.zip
+  - cmd: 7z x master.zip
+  - cmd: set POLLY_ROOT=%cd%\polly-master
+
+  # Install dependencies (CMake, Ninja)
+  - cmd: python %POLLY_ROOT%\bin\install-ci-dependencies.py
+
+  # Tune locations
+  - cmd: set PATH=%cd%\_ci\cmake\bin;%PATH%
+  - cmd: set PATH=%cd%\_ci\ninja;%PATH%
+
+  - cmd: git submodule update --init --recursive
+
+  # Remove entry with sh.exe from PATH to fix error with MinGW toolchain
+  # (For MinGW make to work correctly sh.exe must NOT be in your path)
+  # * http://stackoverflow.com/a/3870338/2288008
+  - cmd: set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
+
+  # Use MinGW from Qt tools because version is higher
+  # * http://www.appveyor.com/docs/installed-software#qt
+  - cmd: set MINGW_PATH=C:\Qt\Tools\mingw492_32\bin
+
+  # MSYS2 location
+  - cmd: set MSYS_PATH=C:\msys64\usr\bin
+
+build_script:
+  - cmd: python .\jenkins.py
+
+# http://www.appveyor.com/docs/branches#white-and-blacklisting
+# Exclude branch 'pkg.template'. Nothing to build there.
+branches:
+  except:
+    - pkg.template
+    - /^pr\..*/
+    - /^v[0-9]+\.[0-9]+\.[0-9]+$/
